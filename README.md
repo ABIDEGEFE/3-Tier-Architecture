@@ -1,3 +1,4 @@
+video demo: https://www.youtube.com/watch?v=ZMhE2jS_mq0
 
 # **Step 1: Virtual Network & Subnet Configuration**  
 
@@ -145,7 +146,7 @@ Deploy scalable virtual machine clusters for frontend (IIS) and backend (Node.js
 | **Load Balancer Type** | Public | Internal |
 | **Allowed Ports** | 80, 443 | 3000 (from frontend only) |
 | **Health Probe** | HTTP:80 | TCP:3000 |
-| **Autoscaling** | CPU > 80% | CPU > 8% |
+| **Autoscaling** | CPU > 80% | CPU < 20% |
 
 ---
 
