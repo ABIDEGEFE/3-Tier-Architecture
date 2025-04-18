@@ -68,4 +68,5 @@ Verify:
 
 DIAGRAMATICAL REPRESENTATION
 
-"C:\Users\SolNet\Downloads\step1Github.png"
+![step1Github](https://github.com/user-attachments/assets/ce56014d-bd17-4654-a2b3-2d9011c6d6d6)
+
