@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Gallery</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 20px; }
+    .item { text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
+    .item img { max-width: 200px; height: auto; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Product Gallery</h1>
+  <div class="gallery" id="gallery">Loading...</div>
+
+  <script>
+    fetch('http://10.0.2.4:3000/api/images')
+      .then(response => response.json())
+      .then(images => {
+        const gallery = document.getElementById('gallery');
+        gallery.innerHTML = '';
+        images.forEach(img => {
+          const item = document.createElement('div');
+          item.className = 'item';
+          item.innerHTML = `<h3>${img.name}</h3><img src="${img.url}" alt="${img.name}">`;
+          gallery.appendChild(item);
+        });
+      })
+      .catch(err => {
+        document.getElementById('gallery').innerHTML = 'Failed to load images.';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
