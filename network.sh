@@ -1,8 +1,8 @@
 #!/bin/bash
 
 vnetName="app_vnet"
-app_subnet="appSB"
-web_subnet="webSB"
+app_subnet="backEndSubnet"
+web_subnet="frontEndSubnet"
 resource_group="arch3"
 storage_name="storage665506"
 location="canadacentral"
