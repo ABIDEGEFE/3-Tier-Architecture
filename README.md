@@ -215,7 +215,7 @@ Create a private, geo-redundant Azure Blob Storage account for product images, a
 ## **Security Validation**
 **Public Access Test** (should fail):
    ```bash
-   curl -I https://contosoproducts.blob.core.windows.net/product-images/
+   curl -I https://storage665506.blob.core.windows.net/product-images/
    # Expected: 403 Forbidden
    ```
 
