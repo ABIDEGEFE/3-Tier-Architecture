@@ -172,3 +172,78 @@ DIAGRAMATICAL REPRESENTATION
 ![step2Github](https://github.com/user-attachments/assets/13a59151-002c-4719-94fc-83a42c09559a)
 
 
+# **Step 3: Secure Blob Storage Configuration**  
+
+## **Objective**  
+Create a private, geo-redundant Azure Blob Storage account for product images, accessible only by the backend tier via Private Endpoint.
+
+---
+
+## **Implementation (Azure Portal Steps)**
+
+### **1. Create Storage Account**
+// you can use the above bash script code to create storage account
+1. Navigate to **Storage Accounts** → **+ Create**
+2. Basic Configuration:
+   - **Name**: `storage665506` // you can use different name based on your project, but must be unique.
+   - **Performance**: Standard
+   - **Redundancy**: **Geo-redundant storage (GRS)**  
+     *(Maintains 6 copies across paired regions for disaster recovery)*
+   - **Public access**: **Disabled** (default)
+
+3. Advanced Security:
+   - Enable **Storage account key rotation**
+   - Disable **Blob public access**
+   - Enable **Infrastructure encryption**
+
+### **2. Configure Private Endpoint**
+1. In your storage account → **Networking** → **Private Endpoint Connections**
+2. **+ Private Endpoint**:
+   - **Name**: `pe-contosoproducts-blob`
+   - **Virtual Network**: `app_vnet`
+   - **Subnet**: `backEndSubnet`
+   - **Target sub-resource**: `blob`
+   - **Private DNS Integration**: Enable (creates `privatelink.blob.core.windows.net`)
+
+### **3. Create Blob Container**
+1. Go to **Containers** → **+ Container**
+   - **Name**: `image`
+   - **Public access level**: Private
+
+---
+
+## **Security Validation**
+**Public Access Test** (should fail):
+   ```bash
+   curl -I https://contosoproducts.blob.core.windows.net/product-images/
+   # Expected: 403 Forbidden
+   ```
+
+---
+
+## **High Availability Configuration**
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| **Redundancy** | GRS | 99.999999999% (11 nines) durability |
+| **Failover** | Manual cross-region failover | Controlled disaster recovery |
+| **Access Tier** | Hot | Optimized for frequent reads |
+| **Lifecycle Policy** | Move to Cool after 30 days | Cost optimization |
+
+---
+
+## **Key Architecture Benefits**
+- 🔒 **Zero Public Exposure**: All access routed through VNet Private Endpoint
+- 🌍 **Geo-Resilience**: GRS maintains copies in paired Azure regions
+- ⚡ **Low-Latency Access**: Backend VMs connect via Azure backbone network
+- 📊 **Scalable Storage**: Automatically scales with product catalog growth
+
+---
+
+---
+
+DIAGRMATICAL REPRESENTATION
+
+![step3Github](https://github.com/user-attachments/assets/9d451f52-f2cf-4e5e-ada7-101f21805478)
+
+
+
