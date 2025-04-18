@@ -70,3 +70,105 @@ DIAGRAMATICAL REPRESENTATION
 
 ![step1Github](https://github.com/user-attachments/assets/ce56014d-bd17-4654-a2b3-2d9011c6d6d6)
 
+
+# **Step 2: Deploy VM Scale Sets & Load Balancers**  
+
+## **Objective**  
+Deploy scalable virtual machine clusters for frontend (IIS) and backend (Node.js) tiers with appropriate load balancing and high availability configurations.
+
+---
+
+## **Implementation (Azure Portal Steps)**
+
+### **1. Frontend Tier (Presentation Layer)**
+#### **VM Scale Set Configuration**
+1. Create a new **Virtual Machine Scale Set**:
+   - **Name**: `vmss-frontend`
+   - **OS**: Windows Server 2019 Datacenter
+   - **Instance size**: Standard_B2s (or your preferred tier)
+   - **Instance count**: 2-4 (enable autoscaling later)
+   - **Virtual network**: `app_vnet`
+   - **Subnet**: `frontEndSubnet`
+
+2. **Load Balancer Setup** (Public-facing):
+   - Create new **Standard SKU** load balancer
+   - **Frontend IP**: Public IP address
+   - **Backend pool**: Select `vmss-frontend` instances
+   - **Health probe**: HTTP on port 80
+   - **Load balancing rule**: 
+     - Protocol: TCP
+     - Port: 80 (HTTP) and 443 (HTTPS)
+     - Session persistence: None
+
+3. **IIS Installation** (via Custom Script Extension):
+   ```powershell
+   Install-WindowsFeature -name Web-Server -IncludeManagementTools
+   ```
+
+### **2. Backend Tier (Application Layer)**
+#### **VM Scale Set Configuration**
+1. Create a new **Virtual Machine Scale Set**:
+   - **Name**: `vmss-backend`
+   - **OS**: Ubuntu 20.04 LTS
+   - **Instance size**: Standard_B2s
+   - **Instance count**: 2
+   - **Virtual network**: `app_vnet`
+   - **Subnet**: `backEndSubnet`
+
+2. **Internal Load Balancer**:
+   - Create new **Standard SKU** internal load balancer
+   - **Frontend IP**: Private IP (e.g., 10.0.2.5)
+   - **Backend pool**: Select `vmss-backend` instances
+   - **Health probe**: TCP on port 3000
+   - **Load balancing rule**:
+     - Protocol: TCP
+     - Port: 3000
+     - Allow floating IP: No
+
+3. **Node.js Deployment** (via Custom Script):
+   ```bash
+   #!/bin/bash
+   sudo apt update
+   sudo apt install -y nodejs npm
+   npm init -y
+   npm install express cors
+   ```
+
+---
+
+## **Configuration Details**
+
+| Component | Frontend Tier | Backend Tier |
+|-----------|--------------|--------------|
+| **VM Image** | Windows Server 2019 | Ubuntu 20.04 LTS |
+| **Scale Set Name** | vmss-frontend | vmss-backend |
+| **Load Balancer Type** | Public | Internal |
+| **Allowed Ports** | 80, 443 | 3000 (from frontend only) |
+| **Health Probe** | HTTP:80 | TCP:3000 |
+| **Autoscaling** | CPU > 80% | CPU > 8% |
+
+---
+
+## **Validation Steps**
+1. **Frontend Test**:
+   - Access the public IP in browser → Should display the first page
+   - Verify load balancer health probes show "Healthy"
+
+2. **Backend Test**:
+   - SSH into a frontend VM
+   - Run `curl http://10.0.2.5:3000/api/image` → Should return image data from storage
+   - Confirm NSG blocks direct internet access to backend
+
+---
+
+## **Key Architecture Principles**
+- 🚀 **Horizontal Scaling**: VMSS allows dynamic instance adjustment
+- 🔒 **Security Isolation**: Backend only accessible via internal LB
+- ⚖️ **Traffic Distribution**: LB ensures even workload spread
+- 🩺 **Health Monitoring**: Probes automatically remove unhealthy instances
+
+DIAGRAMATICAL REPRESENTATION
+
+![step2Github](https://github.com/user-attachments/assets/13a59151-002c-4719-94fc-83a42c09559a)
+
+
